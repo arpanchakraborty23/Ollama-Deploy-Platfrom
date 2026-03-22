@@ -1,0 +1,9 @@
+.agent
+.antigravity
+.env
+__pycache__
+.venv
+.vscode
+.idea
+.DS_Store
+~

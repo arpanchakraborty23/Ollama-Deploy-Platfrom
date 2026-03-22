@@ -1,0 +1,8 @@
+fastapi
+uvicorn
+motor
+httpx
+redis
+python-dotenv
+pydantic-settings
+email-validator
