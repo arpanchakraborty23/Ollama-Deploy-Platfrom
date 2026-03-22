@@ -1,16 +1,29 @@
 import type { ReactNode } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { Terminal, LayoutDashboard, Cpu, Key, LogOut, Menu } from 'lucide-react';
+import {
+  LayoutDashboard, Cpu, Key, LogOut, Menu, X,
+  Settings, HelpCircle, Zap
+} from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { logout } from '../api/auth';
-import clsx from 'clsx';
 import { useState, useEffect } from 'react';
 
 interface LayoutProps {
   children: ReactNode;
   title: string;
 }
+
+const NAV_LINKS = [
+  { to: '/app/dashboard', label: 'Dashboard',  icon: LayoutDashboard, badge: null },
+  { to: '/app/models',    label: 'Models',      icon: Cpu,             badge: null },
+  { to: '/app/keys',      label: 'API Keys',    icon: Key,             badge: '3'  },
+];
+
+const BOTTOM_LINKS = [
+  { label: 'Settings',     icon: Settings    },
+  { label: 'Help & Support', icon: HelpCircle },
+];
 
 export default function Layout({ children, title }: LayoutProps) {
   const { user } = useAuth();
@@ -30,97 +43,228 @@ export default function Layout({ children, title }: LayoutProps) {
     },
   });
 
-  const handleLogout = () => {
-    logoutMutation.mutate();
-  };
-
-  const navLinks = [
-    { to: '/app/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { to: '/app/models', label: 'Models', icon: Cpu },
-    { to: '/app/keys', label: 'API Keys', icon: Key },
-  ];
-
   return (
-    <div className="flex min-h-screen bg-slate-50 font-sans text-slate-900">
+    <div className="flex min-h-screen" style={{ background: 'var(--bg)', fontFamily: 'Inter, system-ui, sans-serif' }}>
+
       {/* Mobile Backdrop */}
       {mobileMenuOpen && (
-        <div 
-          className="fixed inset-0 z-40 bg-gray-900/60 md:hidden" 
+        <div
+          className="fixed inset-0 z-40 md:hidden"
+          style={{ background: 'rgba(0,0,0,0.3)' }}
           onClick={() => setMobileMenuOpen(false)}
         />
       )}
 
-      {/* Sidebar */}
-      <aside className={clsx(
-        "fixed inset-y-0 left-0 z-50 bg-white border-r border-slate-200 text-slate-900 flex flex-col transition-all duration-300",
-        "w-56", // default width
-        "lg:w-56 lg:translate-x-0", // full width on large screens
-        "md:w-16 md:translate-x-0 overflow-x-hidden", // icon only on med screens
-        mobileMenuOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0" // hidden on mobile unless open
-      )}>
-        <div className="flex items-center gap-3 px-4 md:px-5 lg:px-6 h-16 border-b border-slate-100 shrink-0 bg-slate-50/50">
-          <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white shadow-md shadow-indigo-600/20">
-            <Terminal className="w-5 h-5 shrink-0" />
+      {/* ── Sidebar ─────────────────────────────────────────────── */}
+      <aside
+        className={[
+          'fixed inset-y-0 left-0 z-50 flex flex-col transition-transform duration-300',
+          'md:translate-x-0',
+          mobileMenuOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0',
+        ].join(' ')}
+        style={{
+          width: 'var(--sidebar-width)',
+          background: 'var(--surface)',
+          borderRight: '1px solid var(--border)',
+        }}
+      >
+        {/* Brand */}
+        <div
+          className="flex items-center gap-2.5 px-5 shrink-0"
+          style={{ height: 'var(--header-height)', borderBottom: '1px solid var(--border)' }}
+        >
+          <div
+            className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0"
+            style={{ background: 'var(--brand)' }}
+          >
+            <Zap className="w-3.5 h-3.5 text-white" />
           </div>
-          <span className="font-extrabold text-lg tracking-tight md:hidden lg:inline bg-gradient-to-r from-slate-900 to-slate-500 bg-clip-text text-transparent italic">OllamaGate</span>
+          <span className="font-bold text-sm" style={{ color: 'var(--text-primary)' }}>OllamaGate</span>
+          <button
+            className="ml-auto md:hidden"
+            style={{ color: 'var(--text-muted)' }}
+            onClick={() => setMobileMenuOpen(false)}
+          >
+            <X className="w-4 h-4" />
+          </button>
         </div>
 
-        <nav className="flex-1 px-3 py-6 space-y-2 overflow-y-auto">
-          {navLinks.map((item) => (
-            <NavLink
-              key={item.to}
-              to={item.to}
-              onClick={() => setMobileMenuOpen(false)}
-              className={({ isActive }) =>
-                clsx(
-                  'flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors text-sm font-medium',
-                  isActive
-                    ? 'bg-indigo-50 text-indigo-600'
-                    : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'
-                )
-              }
-              title={item.label}
-            >
-              <item.icon className="w-5 h-5 shrink-0" />
-              <span className="md:hidden lg:inline">{item.label}</span>
-            </NavLink>
-          ))}
+        {/* Main Nav */}
+        <nav className="flex-1 overflow-y-auto py-4 px-3">
+          <p className="px-3 mb-2 text-[10px] font-semibold uppercase tracking-widest" style={{ color: 'var(--text-muted)' }}>
+            Main Menu
+          </p>
+          <div className="space-y-0.5">
+            {NAV_LINKS.map((item) => (
+              <NavLink
+                key={item.to}
+                to={item.to}
+                onClick={() => setMobileMenuOpen(false)}
+                className={({ isActive }) =>
+                  `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 ${isActive ? 'nav-active' : 'nav-inactive'}`
+                }
+              >
+                {({ isActive }) => (
+                  <>
+                    <item.icon
+                      className="w-4 h-4 shrink-0"
+                      style={{ color: isActive ? 'var(--brand)' : 'var(--text-secondary)' }}
+                    />
+                    <span style={{ color: isActive ? 'var(--brand)' : 'var(--text-secondary)' }}>
+                      {item.label}
+                    </span>
+                    {item.badge && (
+                      <span
+                        className="ml-auto text-[10px] font-bold rounded-full px-1.5 py-0.5 min-w-[18px] text-center"
+                        style={{
+                          background: isActive ? 'var(--brand)' : '#e8eaed',
+                          color: isActive ? '#fff' : 'var(--text-secondary)',
+                        }}
+                      >
+                        {item.badge}
+                      </span>
+                    )}
+                  </>
+                )}
+              </NavLink>
+            ))}
+          </div>
         </nav>
 
-        <div className="p-3 md:p-2 lg:p-4 border-t border-gray-800 shrink-0">
-          <div className="px-3 md:px-0 lg:px-3 mb-4 truncate md:hidden lg:block">
-            <p className="text-[10px] text-slate-400 uppercase tracking-widest font-black mb-1">
-              Account
-            </p>
-            <p className="text-sm font-bold text-slate-700 truncate" title={user?.email}>
-              {user?.email || 'admin@example.com'}
-            </p>
+        {/* Bottom section */}
+        <div className="px-3 pb-3 shrink-0">
+          {/* Bottom nav links */}
+          <div className="space-y-0.5 mb-4">
+            {BOTTOM_LINKS.map((item) => (
+              <button
+                key={item.label}
+                className="flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-sm font-medium nav-inactive transition-all duration-150"
+                style={{ color: 'var(--text-secondary)' }}
+              >
+                <item.icon className="w-4 h-4 shrink-0" style={{ color: 'var(--text-secondary)' }} />
+                {item.label}
+              </button>
+            ))}
           </div>
-          <button
-            onClick={handleLogout}
-            disabled={logoutMutation.isPending}
-            className="flex items-center w-full gap-3 px-3 py-2 text-sm font-bold text-slate-500 rounded-lg hover:text-rose-600 hover:bg-rose-50 transition-colors md:justify-center lg:justify-start"
-            title="Log out"
+
+          {/* Upgrade CTA — matching the reference card */}
+          <div className="upgrade-card mb-3">
+            <div
+              className="w-8 h-8 rounded-lg flex items-center justify-center mb-3"
+              style={{ background: 'rgba(255,255,255,0.2)' }}
+            >
+              <Zap className="w-4 h-4 text-white" />
+            </div>
+            <p className="text-white font-bold text-sm mb-0.5">Upgrade to Premium!</p>
+            <p className="text-blue-100 text-xs mb-3">Upgrade your account and unlock all of the benefits.</p>
+            <button
+              className="w-full py-2 rounded-lg text-xs font-semibold transition-all"
+              style={{ background: 'rgba(255,255,255,0.2)', color: '#fff', border: '1px solid rgba(255,255,255,0.25)' }}
+              onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,255,255,0.3)'; }}
+              onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,255,255,0.2)'; }}
+            >
+              Upgrade premium
+            </button>
+          </div>
+
+          {/* User row + logout */}
+          <div
+            className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg"
+            style={{ border: '1px solid var(--border)', background: '#fafbfc' }}
           >
-            <LogOut className="w-5 h-5 shrink-0" />
-            <span className="md:hidden lg:inline flex-1 text-left">Log out</span>
-          </button>
+            <div
+              className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-white shrink-0"
+              style={{ background: 'var(--brand)' }}
+            >
+              {(user?.email?.[0] ?? 'A').toUpperCase()}
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-xs font-semibold truncate" style={{ color: 'var(--text-primary)' }}>
+                {user?.email || 'admin@example.com'}
+              </p>
+            </div>
+            <button
+              onClick={() => logoutMutation.mutate()}
+              disabled={logoutMutation.isPending}
+              title="Log out"
+              className="shrink-0 p-1 rounded transition-colors"
+              style={{ color: 'var(--text-muted)' }}
+              onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.color = '#dc2626'; }}
+              onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.color = 'var(--text-muted)'; }}
+            >
+              <LogOut className="w-3.5 h-3.5" />
+            </button>
+          </div>
         </div>
       </aside>
 
-      {/* Main Content Area */}
-      <main className="flex-1 flex flex-col min-w-0 md:ml-16 lg:ml-56 transition-all duration-300 bg-slate-50/50">
-        <header className="h-16 border-b border-slate-200 bg-white/80 backdrop-blur-md flex items-center px-4 sm:px-8 shrink-0 relative z-30">
-          <button 
-            className="md:hidden p-2 mr-3 -ml-2 text-gray-600 hover:bg-gray-100 rounded-lg"
+      {/* ── Main ─────────────────────────────────────────────────── */}
+      <main
+        className="flex-1 flex flex-col min-w-0"
+        style={{ marginLeft: 'var(--sidebar-width)' }}
+      >
+        {/* Top Header */}
+        <header
+          className="shrink-0 flex items-center px-6 sm:px-8 gap-4"
+          style={{
+            height: 'var(--header-height)',
+            background: 'var(--surface)',
+            borderBottom: '1px solid var(--border)',
+            position: 'sticky',
+            top: 0,
+            zIndex: 30,
+          }}
+        >
+          {/* Mobile burger */}
+          <button
+            className="md:hidden"
+            style={{ color: 'var(--text-secondary)' }}
             onClick={() => setMobileMenuOpen(true)}
           >
             <Menu className="w-5 h-5" />
           </button>
-          <h1 className="text-lg font-black text-slate-900 tracking-tight uppercase italic">{title}</h1>
+
+          {/* Page title */}
+          <h1 className="text-xl font-bold" style={{ color: 'var(--text-primary)' }}>{title}</h1>
+
+          {/* Right controls */}
+          <div className="ml-auto flex items-center gap-2">
+            {/* Date range pill */}
+            <button className="btn-secondary text-[12px]">
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+              Jan 1, 2025 - Feb, 1 2025
+            </button>
+
+            {/* Last N days */}
+            <button className="btn-secondary text-[12px]">
+              Last 30 days
+              <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+
+            {/* Add widget */}
+            <button className="btn-secondary text-[12px]">
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
+              Add widget
+            </button>
+
+            {/* Export */}
+            <button className="btn-primary text-[12px]">
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+              </svg>
+              Export
+            </button>
+          </div>
         </header>
 
-        <div className="flex-1 p-0 overflow-auto">
+        {/* Page content */}
+        <div className="flex-1 overflow-auto">
           {children}
         </div>
       </main>

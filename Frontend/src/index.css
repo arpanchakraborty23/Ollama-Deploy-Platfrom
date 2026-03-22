@@ -4,12 +4,226 @@
 @tailwind components;
 @tailwind utilities;
 
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,300;0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;0,14..32,800;0,14..32,900;1,14..32,700&display=swap');
+
+/* ── Design Tokens ───────────────────────────────────────────── */
+:root {
+  /* Layout */
+  --sidebar-width: 220px;
+  --header-height: 60px;
+
+  /* Neutrals */
+  --bg:          #f5f6fa;
+  --surface:     #ffffff;
+  --border:      #e8eaed;
+  --border-2:    #dde1e7;
+  --text-primary: #1a1d23;
+  --text-secondary: #5f6672;
+  --text-muted:   #9ba3af;
+
+  /* Brand */
+  --brand:        #2563eb;
+  --brand-light:  #eff6ff;
+  --brand-muted:  #bfdbfe;
+
+  /* Status */
+  --green:        #16a34a;
+  --green-bg:     #f0fdf4;
+  --red:          #dc2626;
+  --red-bg:       #fef2f2;
+  --amber:        #d97706;
+  --amber-bg:     #fffbeb;
+
+  /* Shadows */
+  --shadow-sm:  0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md:  0 4px 12px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.04);
+  --shadow-lg:  0 12px 32px rgba(0,0,0,0.10), 0 4px 8px rgba(0,0,0,0.04);
+}
+
+/* ── Base ────────────────────────────────────────────────────── */
 @layer base {
+  *, *::before, *::after { box-sizing: border-box; }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
   body {
-    @apply bg-slate-50 text-slate-900 antialiased font-sans selection:bg-indigo-100 selection:text-indigo-900;
+    background-color: var(--bg);
+    color: var(--text-primary);
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
   }
-  
-  h1, h2, h3, h4, h5, h6, .font-black {
-    @apply font-display tracking-tight;
+
+  ::selection {
+    background: var(--brand-light);
+    color: var(--brand);
   }
+
+  ::-webkit-scrollbar       { width: 5px; height: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border-2); border-radius: 99px; }
+  ::-webkit-scrollbar-thumb:hover { background: #c4c9d4; }
+}
+
+/* ── Card ────────────────────────────────────────────────────── */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow 0.2s, border-color 0.2s;
+}
+.card:hover {
+  box-shadow: var(--shadow-md);
+  border-color: var(--border-2);
+}
+
+/* ── Shimmer skeleton ────────────────────────────────────────── */
+@keyframes shimmer {
+  0%   { background-position: -600px 0; }
+  100% { background-position:  600px 0; }
+}
+.skeleton {
+  background: linear-gradient(90deg, #f0f2f5 25%, #e4e7ed 50%, #f0f2f5 75%);
+  background-size: 1200px 100%;
+  animation: shimmer 1.6s infinite;
+  border-radius: 6px;
+}
+
+/* ── Trend badge ─────────────────────────────────────────────── */
+.trend-up {
+  color: var(--green);
+  background: var(--green-bg);
+  border: 1px solid #bbf7d0;
+}
+.trend-down {
+  color: var(--red);
+  background: var(--red-bg);
+  border: 1px solid #fecaca;
+}
+.trend-neutral {
+  color: var(--text-secondary);
+  background: #f1f3f6;
+  border: 1px solid var(--border);
+}
+
+/* ── Active nav ──────────────────────────────────────────────── */
+.nav-active {
+  background: var(--brand-light);
+  color: var(--brand) !important;
+  border-left: 3px solid var(--brand);
+  font-weight: 600;
+}
+.nav-inactive {
+  color: var(--text-secondary);
+  border-left: 3px solid transparent;
+}
+.nav-inactive:hover {
+  background: #f5f6fa;
+  color: var(--text-primary);
+}
+
+/* ── Button variants ─────────────────────────────────────────── */
+.btn-primary {
+  background: var(--brand);
+  color: #fff;
+  border: 1px solid var(--brand);
+  padding: 7px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, box-shadow 0.15s;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.btn-primary:hover {
+  background: #1d4ed8;
+  box-shadow: 0 4px 12px rgba(37,99,235,0.3);
+}
+
+.btn-secondary {
+  background: var(--surface);
+  color: var(--text-primary);
+  border: 1px solid var(--border-2);
+  padding: 7px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.btn-secondary:hover {
+  background: #f8f9fb;
+  border-color: #c4c9d4;
+}
+
+/* ── Data table ──────────────────────────────────────────────── */
+.data-table { width: 100%; border-collapse: collapse; }
+.data-table th {
+  padding: 10px 16px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  background: #f8f9fb;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+}
+.data-table td {
+  padding: 12px 16px;
+  font-size: 13px;
+  color: var(--text-primary);
+  border-bottom: 1px solid #f0f2f5;
+}
+.data-table tr:last-child td { border-bottom: none; }
+.data-table tbody tr:hover td { background: #fafbfc; }
+
+/* ── Upgrade CTA card ────────────────────────────────────────── */
+.upgrade-card {
+  background: linear-gradient(135deg, #1e40af, #2563eb 60%, #3b82f6);
+  border-radius: 12px;
+  padding: 16px;
+  color: #fff;
+}
+
+/* ── Form input ──────────────────────────────────────────────── */
+.form-input-field {
+  width: 100%;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-family: 'Inter', system-ui, sans-serif;
+  background: #fafbfc;
+  border: 1px solid var(--border-2);
+  color: var(--text-primary);
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.form-input-field::placeholder { color: var(--text-muted); }
+.form-input-field:focus {
+  border-color: var(--brand);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+/* ── Progress bar ────────────────────────────────────────────── */
+.progress-bar {
+  height: 4px;
+  border-radius: 99px;
+  background: var(--border);
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  border-radius: 99px;
+  transition: width 0.5s ease;
 }
